@@ -34,6 +34,8 @@ module.exports = {
     'vue/singleline-html-element-content-newline': 'off',
     // require a line break before and after the contents of a multiline element
     'vue/multiline-html-element-content-newline': 'off',
+    // require component names to be always multi-word
+    'vue/multi-word-component-names': 'off',
     // enforce specific casing for the name property in Vue components
     'vue/name-property-casing': ['error', 'PascalCase'],
     // disallow use of v-html to prevent XSS attack
