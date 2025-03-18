@@ -1,14 +1,14 @@
-import axios from 'axios'
-import store from '@/store'
+import axios, { InternalAxiosRequestConfig } from 'axios'
+// import store from '@/store'
 import { ElLoading, ElMessage } from 'element-plus'
 
-const BASEURL = ''
+const BASEURL = '/api'
 const TIMEOUT = 5 * 60 * 1000
 const HEADERS = {
   'content-type': 'application/json;charset=UTF-8'
 }
 
-const service = axios.create({
+const instance = axios.create({
   // 自定义请求头
   headers: HEADERS,
   // 可以通过设置一个 `baseURL` 便于为 axios 实例的方法传递相对 URL
@@ -20,8 +20,8 @@ const service = axios.create({
 })
 
 // 获取登录用户标识
-const handleAuth = (config: { header: { [x: string]: string } }) => {
-  config.header['token'] = localStorage.getItem('token') || ''
+const handleAuth = (config: InternalAxiosRequestConfig<object>) => {
+  config.headers['token'] = localStorage.getItem('token') || ''
   return config
 }
 
@@ -106,7 +106,37 @@ const handleAuthError = (errno: string | number) => {
 }
 
 // 添加请求拦截器
-service.interceptors.request.use(config => {})
+instance.interceptors.request.use(config => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.authorization = `Bearer ${token}`
+    handleAuth(config)
+  }
+  ElLoading.service({ fullscreen: true })
+  return config
+})
 
 // 添加响应拦截器
-service.interceptors.response.use(response => {})
+instance.interceptors.response.use(
+  response => {
+    ElLoading.service().close()
+    return response
+  },
+  error => {
+    ElLoading.service().close()
+    handleNetworkError(error.state)
+    handleAuthError(error.state)
+  }
+)
+
+const httpRequest = {
+  get: (url: string, params: object) => instance.get(url, { params }),
+
+  post: (url: string, data: object) => instance.post(url, data),
+
+  put: (url: string, data: object) => instance.put(url, data),
+
+  delete: (url: string) => instance.delete(url)
+}
+
+export default httpRequest

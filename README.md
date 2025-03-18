@@ -30,3 +30,6 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+### autofit.js
+auto fit screen [autofit.js](https://auto-plugin.github.io/autofit.js/).
